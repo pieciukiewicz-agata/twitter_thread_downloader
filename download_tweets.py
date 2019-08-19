@@ -2,8 +2,8 @@ import datetime
 from pymongo import MongoClient
 import twitter
 import urllib.parse
-long=int
-############################# - TODO
+
+
 
 # loading twitter tokens from a file
 def load_tokens(path):
@@ -61,10 +61,10 @@ def load_users(user_file, tweetsDB):
 
             try:
                 last_tweet = tweetsDB.find({"user.screen_name": user_id}).sort("created_at_mongo", -1).limit(1)
-                if last_tweet.count(True) == 1:
+                if last_tweet.count_documents(True) == 1:
                     user_id2last_tweet_id[user_id] = last_tweet[0]['id_str']
                 last_reply = tweetsDB.find({"in_reply_to_screen_name":user_id}).sort("created_at_mongo", -1).limit(1)
-                if last_reply.count(True) == 1:
+                if last_reply.count_documents(True) == 1:
                     user_id2last_reply_id[user_id] = last_reply[0]['id_str']
             except Exception as ex:
                 print (ex)
@@ -80,8 +80,8 @@ def getAllTweetsForUser(api, user_id, newest_sid):
     if len(tweets)>0:
         oldest_current_id = tweets[len(tweets) - 1].id
     if not end:
-        while long(oldest_current_id) > long(newest_sid):
-            end, tweets = get_user_tweets(api, user_id, newest_sid, long(oldest_current_id) - 1)
+        while int(oldest_current_id) > int(newest_sid):
+            end, tweets = get_user_tweets(api, user_id, newest_sid, int(oldest_current_id) - 1)
             if end:
                 break
             print(len(tweets), len(tlist))
@@ -100,8 +100,8 @@ def getAllRepliesForUser(api, user_id, newest_sid):
         oldest_reply_id = replies[len(replies) - 1].id
     print(len(rlist))
     if not end:
-        while long(oldest_reply_id) > long(newest_sid):
-            end, replies = get_replies_to_user(api, user_id, newest_sid, long(oldest_reply_id) - 1)
+        while int(oldest_reply_id) > int(newest_sid):
+            end, replies = get_replies_to_user(api, user_id, newest_sid, int(oldest_reply_id) - 1)
             if end:
                 break
             oldest_reply_id = replies[len(replies) - 1].id

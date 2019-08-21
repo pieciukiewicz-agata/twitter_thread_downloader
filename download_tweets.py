@@ -69,10 +69,10 @@ def load_users(user_file, tweetsDB):
 
             try:
                 last_tweet = tweetsDB.find({"user.screen_name": user_id}).sort("created_at_mongo", -1).limit(1)
-                if last_tweet.count_documents(True) == 1:
+                if last_tweet.count(True) == 1:
                     user_id2last_tweet_id[user_id] = last_tweet[0]['id_str']
                 last_reply = tweetsDB.find({"in_reply_to_screen_name":user_id}).sort("created_at_mongo", -1).limit(1)
-                if last_reply.count_documents(True) == 1:
+                if last_reply.count(True) == 1:
                     user_id2last_reply_id[user_id] = last_reply[0]['id_str']
             except Exception as ex:
                 print (ex)
@@ -185,5 +185,3 @@ def main():
         print(ex)
 
 main()
-
-

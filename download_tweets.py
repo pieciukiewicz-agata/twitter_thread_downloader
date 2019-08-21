@@ -26,27 +26,35 @@ def load_tokens(path):
 # downloading new tweets from user's timeline - in blocks of up to 200
 def get_user_tweets(api, user, s_id, m_id):
     end = False
-    statuses = api.GetUserTimeline(screen_name=user, since_id=s_id, max_id=m_id, count=200)
-    if len(statuses) == 0:
-        end = True
-    else:
-        print('\t%s has %i new tweets' % (user, len(statuses)))
-    return end,statuses
+    try:
+        statuses = api.GetUserTimeline(screen_name=user, since_id=s_id, max_id=m_id, count=200)
+        if len(statuses) == 0:
+            end = True
+        else:
+            print('\t%s has %i new tweets' % (user, len(statuses)))
+        return end,statuses
+    except twitter.error.TwitterError as err:
+        print(err.message[0]['message'])
+        exit()
 
 # downloading replies to a user, twitter api does not allow downloading replies to a specific tweet - in blocks of up to 200
 def get_replies_to_user(api, user, s_id, m_id):
     end = False
-    if m_id is not None:
-        q = urllib.parse.urlencode({"q": "to:%s since_id:%s max_id:%s " % (user, s_id, m_id)})
-    else:
-        q = urllib.parse.urlencode({"q": "to:%s since_id:%s" % (user, s_id)})
-    print(q, s_id, m_id)
-    statuses = api.GetSearch(raw_query=q, since_id=s_id, max_id=m_id, count=200)
-    if len(statuses) == 0:
-        end = True
-    else:
-        print('\t%s has %i new replies' % (user, len(statuses)))
-    return end,statuses
+    try:
+        if m_id is not None:
+            q = urllib.parse.urlencode({"q": "to:%s since_id:%s max_id:%s " % (user, s_id, m_id)})
+        else:
+            q = urllib.parse.urlencode({"q": "to:%s since_id:%s" % (user, s_id)})
+        print(q, s_id, m_id)
+        statuses = api.GetSearch(raw_query=q, since_id=s_id, max_id=m_id, count=200)
+        if len(statuses) == 0:
+            end = True
+        else:
+            print('\t%s has %i new replies' % (user, len(statuses)))
+        return end,statuses
+    except twitter.error.TwitterError as err:
+        print(err.message[0]['message'])
+        exit()
 
 # loads user screen names from a file, retrieves last user's tweet id and last reply to user's tweet available in database
 def load_users(user_file, tweetsDB):
